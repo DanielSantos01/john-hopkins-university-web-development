@@ -1,0 +1,95 @@
+*{
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
+}
+
+body{
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+.container{
+    position: relative;
+}
+
+h1{
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 40px;
+}
+
+/* smartphone size */
+.item{
+    border: 1px solid black;
+    width: 90%;
+    text-align: left;
+    margin-bottom: 3%;
+    margin-left: 5%;
+    background-color: gray;
+}
+
+.item > h2{
+    border: 1px solid black;
+    width: 37%;
+    float: right;
+    text-align: center;
+}
+
+.item > p{
+    clear: right;
+    padding: 10px;
+}
+
+.beef > h2{
+    color: white;
+    background-color: brown;
+}
+
+.chicken > h2{
+    background-color: fuchsia;
+}
+
+.sushi > h2{
+    background-color: yellow;
+}
+
+/* computer size */
+@media (min-width: 992px){
+    .item{
+        width: 32%;
+        float: left;
+        margin-left: 0%;
+    }
+    .chicken{
+        margin-right: 2%;
+    }
+    .beef{
+        margin-right: 2%;
+    }
+}
+
+/* tablet size */
+@media (min-width: 768px) and (max-width: 991px){
+    .item{
+        float: left;
+        margin-left: 0%;
+    }
+    .beef{
+        width: 49%;
+        float: left;
+        margin-left: 1%;
+        margin-bottom: 2%;
+    }
+    .chicken{
+        width: 49%;
+        float: left;
+        margin-right: 1%;
+        margin-bottom: 2%;
+    }
+    .sushi{
+        width: 100%;
+    }
+}
+
+
