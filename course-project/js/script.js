@@ -11,6 +11,8 @@ $(function(){
     //site object
     let dc = {};
 
+    let currentActive = 'navHomeButton';
+
     //url do snippet da tela principal
     const homeHTML = 'snippets/home-snippet.html';
 
@@ -46,16 +48,23 @@ $(function(){
     //refatora a string recebida substituindo o valor desejado pelo valor passado
     let insertProperty = function (string, propName, propValue) {
         let propToReplace = "{{" + propName + "}}";
-        let result = string.replace(new RegExp(propToReplace, "g"), propValue);
-        return result;
+        string = string.replace(new RegExp(propToReplace, "g"), propValue);
+        return string;
     }
+
+    //função responsável por fazer a requisição do conteúdo da página principal
+    dc.loadHomePage = function(){
+        $ajaxUtils.sendGetRequest(homeHTML, function(responseText){
+            document.querySelector('#main-content').innerHTML = responseText;
+        }, false);
+
+        switchToActive('navHomeButton');
+    };
 
     //mostra a tela de loading e faz a requisição do conteúdo da tela principal assim que o site carrega pela primeira vez
     document.addEventListener('DOMContentLoaded', function(event){
         showLoading('#main-content');
-        $ajaxUtils.sendGetRequest(homeHTML, function(responseText){
-            document.querySelector('#main-content').innerHTML = responseText;
-        }, false);
+        dc.loadHomePage();
     });
 
 
@@ -65,6 +74,7 @@ $(function(){
         showLoading("#main-content");
         //requisição pelo JSON
         $ajaxUtils.sendGetRequest(allCategoriesUrl, buildAndShowCategoriesHTML);
+        switchToActive('navMenuButton');
     };
 
     //método que diretriza todos os recebimentos de requisições
@@ -103,6 +113,7 @@ $(function(){
         return finalHtml;
     }
     /*                          END OF DINAMICALLY CATEGORIES                                   */
+
 
     /*                             DINAMICALLY MENU ITEMS                                       */
 
@@ -208,6 +219,14 @@ $(function(){
 
       /*                           END OF DINAMICALLY MENU ITEMS                                   */
       
+
+    let switchToActive = function(elementToActivate){
+        if(elementToActivate != currentActive){
+            document.getElementById(currentActive).classList.remove('active');
+            document.getElementById(elementToActivate).classList.add('active');
+            currentActive = elementToActivate;
+        }
+    };
   
     window.$dc = dc;
 

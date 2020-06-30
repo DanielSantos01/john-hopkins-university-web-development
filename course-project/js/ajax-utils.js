@@ -31,7 +31,7 @@
     };
 
     function handleResponse(request, responseHandler, isJson){ //fnção realmente executada quando o request for aceito
-        if(request.readyState == 4 && request.status == 200){ //verifica o status da requisição7
+        if(request.readyState == 4 && request.status == 200){ //verifica o status da requisição
             if(isJson == undefined){
                 isJson = true;
             }
