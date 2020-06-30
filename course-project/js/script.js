@@ -12,16 +12,22 @@ $(function(){
     let dc = {};
 
     //url do snippet da tela principal
-    let homeHTML = 'snippets/home-snippet.html';
+    const homeHTML = 'snippets/home-snippet.html';
 
     //url do local onde está localizado o JSON das categorias
-    let allCategoriesUrl ="https://davids-restaurant.herokuapp.com/categories.json";
+    const allCategoriesUrl ="https://davids-restaurant.herokuapp.com/categories.json";
 
     //url do snippet com o título da página
-    let categoriesTitleHtml = "snippets/categories-title-snippet.html";
+    const categoriesTitleHtml = "snippets/categories-title-snippet.html";
 
     //url do snippet com o html para inserir as imagens e legendas
-    let categoryHtml = "snippets/category-snippet.html";
+    const categoryHtml = "snippets/category-snippet.html";
+
+    const menuItemsUrl = "https://davids-restaurant.herokuapp.com/menu_items.json?category=";
+
+    const menuItemsTitleHtml = "snippets/menu-items-title.html";
+
+    const menuItemHtml = "snippets/menu-item.html";
 
 
     //insere o html recebido dentro do elemento recebido
@@ -52,6 +58,8 @@ $(function(){
         }, false);
     });
 
+
+    /*                          DINAMICALLY CATEGORIES                                           */
     //método inicial para carregar o conteúdo das categorias
     dc.loadMenuCategories = function(){
         showLoading("#main-content");
@@ -76,11 +84,11 @@ $(function(){
     //método que organiza a string que será interpretada como html posteriormente
     function buildCategoriesViewHtml(categories,categoriesTitleHtml,categoryHtml) {
   
-        var finalHtml = categoriesTitleHtml;
+        let finalHtml = categoriesTitleHtml;
         finalHtml += "<section class='row'>";
     
         //Loop over categories
-        for (var i = 0; i < categories.length; i++) {
+        for (let i = 0; i < categories.length; i++) {
             var html = categoryHtml;
             var name = "" + categories[i].name;
             var short_name = categories[i].short_name;
@@ -94,6 +102,112 @@ $(function(){
         finalHtml += "</section>";
         return finalHtml;
     }
+    /*                          END OF DINAMICALLY CATEGORIES                                   */
+
+    /*                             DINAMICALLY MENU ITEMS                                       */
+
+    //método responsável por iniciar o carregamento do conteúdo da página "single category", de acordo com a caregoria (short_name) passada
+    dc.loadMenuItems = function (categoryShort) {
+        showLoading("#main-content");
+        $ajaxUtils.sendGetRequest(menuItemsUrl + categoryShort, buildAndShowMenuItemsHTML);
+      };
+
+    
+    function buildAndShowMenuItemsHTML (categoryMenuItems) {
+        // Load title snippet of menu items page
+        $ajaxUtils.sendGetRequest(menuItemsTitleHtml,function (menuItemsTitleHtml) {
+            // Retrieve single menu item snippet
+            $ajaxUtils.sendGetRequest(menuItemHtml,function (menuItemHtml) {
+                let menuItemsViewHtml =
+                  buildMenuItemsViewHtml(categoryMenuItems,menuItemsTitleHtml,menuItemHtml);
+
+                insertHTML("#main-content", menuItemsViewHtml);
+              },
+              false);
+          },
+          false);
+    }
+      
+      
+    // Using category and menu items data and snippets html
+    // build menu items view HTML to be inserted into page
+    function buildMenuItemsViewHtml(categoryMenuItems,menuItemsTitleHtml,menuItemHtml) {
+      
+        menuItemsTitleHtml = insertProperty(menuItemsTitleHtml,"name",
+                         categoryMenuItems.category.name);
+
+        menuItemsTitleHtml = insertProperty(menuItemsTitleHtml,"special_instructions",
+                         categoryMenuItems.category.special_instructions);
+      
+        let finalHtml = menuItemsTitleHtml;
+
+        finalHtml += "<section class='row'>";
+      
+        // Loop over menu items
+        let menuItems = categoryMenuItems.menu_items;
+
+        let catShortName = categoryMenuItems.category.short_name;
+
+        for (let i = 0; i < menuItems.length; i++) {
+          // Insert menu item values
+          let html = menuItemHtml;
+
+          html = insertProperty(html, "short_name", menuItems[i].short_name);
+
+          html = insertProperty(html, "catShortName", catShortName);
+
+          html = insertItemPrice(html,"price_small",menuItems[i].price_small);
+
+          html = insertItemPortionName(html,"small_portion_name",menuItems[i].small_portion_name);
+
+          html = insertItemPrice(html,"price_large",menuItems[i].price_large);
+
+          html = insertItemPortionName(html,"large_portion_name",menuItems[i].large_portion_name);
+
+          html = insertProperty(html, "name", menuItems[i].name);
+
+          html = insertProperty(html, "description",menuItems[i].description);
+      
+          // Add clearfix after every second menu item
+          if (i % 2 != 0) {
+            html += "<div class='clearfix visible-lg-block visible-md-block'></div>";
+          }
+      
+          finalHtml += html;
+        }
+      
+        finalHtml += "</section>";
+        return finalHtml;
+    }
+      
+      
+    // Appends price with '$' if price exists
+    function insertItemPrice(html,pricePropName,priceValue) {
+        // If not specified, replace with empty string
+        if (!priceValue) {
+          return insertProperty(html, pricePropName, "");
+        }
+      
+        priceValue = "$" + priceValue.toFixed(2);
+        html = insertProperty(html, pricePropName, priceValue);
+        return html;
+    }
+      
+      
+    // Appends portion name in parens if it exists
+    function insertItemPortionName(html,portionPropName,portionValue) {
+        // If not specified, return original string
+        if (!portionValue) {
+          return insertProperty(html, portionPropName, "");
+        }
+      
+        portionValue = "(" + portionValue + ")";
+        html = insertProperty(html, portionPropName, portionValue);
+        return html;
+    }
+
+      /*                           END OF DINAMICALLY MENU ITEMS                                   */
+      
   
     window.$dc = dc;
 
